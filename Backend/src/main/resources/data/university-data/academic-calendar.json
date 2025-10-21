@@ -1,0 +1,108 @@
+
+
+{
+  "academic_year": "2024-2025",
+  "semesters": {
+    "fall_2024": {
+      "name": "Fall 2024",
+      "start_date": "2024-08-26",
+      "end_date": "2024-12-13",
+      "important_dates": {
+        "registration_opens": "2024-04-15",
+        "registration_priority_deadline": "2024-07-01",
+        "registration_closes": "2024-08-23",
+        "classes_begin": "2024-08-26",
+        "add_drop_deadline": "2024-09-06",
+        "withdrawal_deadline": "2024-11-01",
+        "final_exams_start": "2024-12-09",
+        "final_exams_end": "2024-12-13",
+        "grades_due": "2024-12-16"
+      },
+      "holidays": [
+        {
+          "name": "Labor Day",
+          "date": "2024-09-02",
+          "classes_cancelled": true
+        },
+        {
+          "name": "Thanksgiving Break",
+          "start_date": "2024-11-28",
+          "end_date": "2024-11-29",
+          "classes_cancelled": true
+        }
+      ]
+    },
+    "spring_2025": {
+      "name": "Spring 2025",
+      "start_date": "2025-01-13",
+      "end_date": "2025-05-02",
+      "important_dates": {
+        "registration_opens": "2024-10-15",
+        "registration_priority_deadline": "2024-12-01",
+        "registration_closes": "2025-01-10",
+        "classes_begin": "2025-01-13",
+        "add_drop_deadline": "2025-01-24",
+        "withdrawal_deadline": "2025-03-21",
+        "spring_break_start": "2025-03-10",
+        "spring_break_end": "2025-03-14",
+        "final_exams_start": "2025-04-28",
+        "final_exams_end": "2025-05-02",
+        "commencement": "2025-05-10",
+        "grades_due": "2025-05-05"
+      },
+      "holidays": [
+        {
+          "name": "Martin Luther King Jr. Day",
+          "date": "2025-01-20",
+          "classes_cancelled": true
+        },
+        {
+          "name": "Presidents Day",
+          "date": "2025-02-17",
+          "classes_cancelled": true
+        }
+      ]
+    },
+    "summer_2025": {
+      "name": "Summer 2025",
+      "start_date": "2025-05-19",
+      "end_date": "2025-08-08",
+      "important_dates": {
+        "registration_opens": "2025-02-15",
+        "registration_closes": "2025-05-16",
+        "classes_begin": "2025-05-19",
+        "add_drop_deadline": "2025-05-23",
+        "withdrawal_deadline": "2025-07-18",
+        "final_exams_start": "2025-08-04",
+        "final_exams_end": "2025-08-08",
+        "grades_due": "2025-08-11"
+      },
+      "holidays": [
+        {
+          "name": "Memorial Day",
+          "date": "2025-05-26",
+          "classes_cancelled": true
+        },
+        {
+          "name": "Independence Day",
+          "date": "2025-07-04",
+          "classes_cancelled": true
+        }
+      ]
+    }
+  },
+  "graduation_deadlines": {
+    "fall_2024": {
+      "application_deadline": "2024-09-15",
+      "graduation_date": "2024-12-20"
+    },
+    "spring_2025": {
+      "application_deadline": "2025-01-27",
+      "graduation_date": "2025-05-10"
+    },
+    "summer_2025": {
+      "application_deadline": "2025-06-15",
+      "graduation_date": "2025-08-15"
+    }
+  }
+}

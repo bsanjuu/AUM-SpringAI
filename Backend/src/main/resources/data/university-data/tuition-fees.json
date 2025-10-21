@@ -1,0 +1,74 @@
+
+{
+  "tuition_rates": {
+    "undergraduate": {
+      "in_state": {
+        "per_credit": 450,
+        "full_time_semester": 5400,
+        "part_time_additional_fees": 200
+      },
+      "out_of_state": {
+        "per_credit": 750,
+        "full_time_semester": 9000,
+        "part_time_additional_fees": 300
+      },
+      "international": {
+        "per_credit": 850,
+        "full_time_semester": 10200,
+        "part_time_additional_fees": 400
+      }
+    },
+    "graduate": {
+      "in_state": {
+        "per_credit": 550,
+        "full_time_semester": 6600,
+        "part_time_additional_fees": 250
+      },
+      "out_of_state": {
+        "per_credit": 850,
+        "full_time_semester": 10200,
+        "part_time_additional_fees": 350
+      },
+      "international": {
+        "per_credit": 950,
+        "full_time_semester": 11400,
+        "part_time_additional_fees": 450
+      }
+    }
+  },
+  "mandatory_fees": {
+    "technology_fee": 50,
+    "lab_fee": 75,
+    "graduation_fee": 100,
+    "parking_fee": 120,
+    "health_service_fee": 200,
+    "student_activity_fee": 30,
+    "library_fee": 25
+  },
+  "payment_deadlines": {
+    "fall_2024": "2024-08-15",
+    "spring_2025": "2025-01-15",
+    "summer_2025": "2025-05-15"
+  },
+  "refund_policy": {
+    "100_percent": "Before first day of classes",
+    "80_percent": "Within first week of classes",
+    "60_percent": "Within second week of classes",
+    "40_percent": "Within third week of classes",
+    "20_percent": "Within fourth week of classes",
+    "0_percent": "After fourth week of classes"
+  },
+  "payment_methods": [
+    "Credit Card (Visa, MasterCard, American Express)",
+    "Electronic Check",
+    "Bank Transfer",
+    "Payment Plan (3 installments)",
+    "Financial Aid",
+    "Scholarships"
+  ],
+  "late_payment_fees": {
+    "first_late_fee": 25,
+    "subsequent_late_fees": 50,
+    "grace_period_days": 10
+  }
+}

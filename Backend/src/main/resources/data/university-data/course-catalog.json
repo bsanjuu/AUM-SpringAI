@@ -1,0 +1,87 @@
+
+
+{
+  "departments": {
+    "computer_science": {
+      "name": "Computer Science",
+      "code": "CS",
+      "description": "The Computer Science department offers comprehensive programs in software development, algorithms, and computing systems.",
+      "courses": {
+        "CS101": {
+          "title": "Introduction to Programming",
+          "credits": 3,
+          "prerequisites": [],
+          "description": "Fundamental programming concepts using Python. Variables, control structures, functions, and basic data structures.",
+          "offered_semesters": ["Fall", "Spring", "Summer"]
+        },
+        "CS201": {
+          "title": "Data Structures and Algorithms",
+          "credits": 4,
+          "prerequisites": ["CS101"],
+          "description": "Implementation and analysis of fundamental data structures and algorithms. Arrays, linked lists, trees, sorting, and searching.",
+          "offered_semesters": ["Fall", "Spring"]
+        },
+        "CS301": {
+          "title": "Database Systems",
+          "credits": 3,
+          "prerequisites": ["CS201"],
+          "description": "Database design, SQL, normalization, transactions, and database administration.",
+          "offered_semesters": ["Fall", "Spring"]
+        },
+        "CS401": {
+          "title": "Software Engineering",
+          "credits": 4,
+          "prerequisites": ["CS201", "CS301"],
+          "description": "Software development lifecycle, design patterns, testing, and project management.",
+          "offered_semesters": ["Fall", "Spring"]
+        }
+      }
+    },
+    "business_administration": {
+      "name": "Business Administration",
+      "code": "BUS",
+      "description": "Comprehensive business education covering management, finance, marketing, and operations.",
+      "courses": {
+        "BUS101": {
+          "title": "Introduction to Business",
+          "credits": 3,
+          "prerequisites": [],
+          "description": "Overview of business functions, entrepreneurship, and the global business environment.",
+          "offered_semesters": ["Fall", "Spring", "Summer"]
+        },
+        "BUS201": {
+          "title": "Principles of Management",
+          "credits": 3,
+          "prerequisites": ["BUS101"],
+          "description": "Management theories, leadership, organizational behavior, and decision-making.",
+          "offered_semesters": ["Fall", "Spring"]
+        },
+        "BUS301": {
+          "title": "Marketing Management",
+          "credits": 3,
+          "prerequisites": ["BUS201"],
+          "description": "Marketing strategies, consumer behavior, market research, and digital marketing.",
+          "offered_semesters": ["Fall", "Spring"]
+        }
+      }
+    }
+  },
+  "degree_requirements": {
+    "bachelor_computer_science": {
+      "total_credits": 120,
+      "core_requirements": 45,
+      "major_requirements": 54,
+      "electives": 21,
+      "required_courses": ["CS101", "CS201", "CS301", "CS401"],
+      "math_requirements": ["MATH101", "MATH201", "STAT101"]
+    },
+    "bachelor_business_administration": {
+      "total_credits": 120,
+      "core_requirements": 42,
+      "major_requirements": 48,
+      "electives": 30,
+      "required_courses": ["BUS101", "BUS201", "BUS301"],
+      "math_requirements": ["MATH101", "STAT101"]
+    }
+  }
+}
