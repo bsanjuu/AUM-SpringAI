@@ -1,0 +1,64 @@
+# Development Profile Configuration
+# Overrides and additions for development environment
+
+spring:
+  # Development Database
+  datasource:
+    url: jdbc:postgresql://localhost:5432/aum_faq_dev
+    username: postgres
+    password: postgres
+    
+  # JPA Configuration for Development
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        
+  # Development AI Provider (use Ollama for local testing)
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:sk-test-key}
+    ollama:
+      base-url: http://localhost:11434
+      
+  # Development Cache (smaller size)
+  cache:
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=30m
+
+# Development-specific App Configuration
+app:
+  ai:
+    provider: ollama
+    enable-caching: true
+    enable-metrics: true
+    
+  security:
+    cors:
+      allowed-origins: http://localhost:4200,http://localhost:8080
+      
+  scheduler:
+    enabled: true
+
+# Development Logging (verbose)
+logging:
+  level:
+    root: INFO
+    com.bsanju.aum: DEBUG
+    org.springframework.ai: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  file:
+    name: logs/dev/aum-spring-ai-dev.log
+
+# Development Server
+server:
+  port: 8080
+  error:
+    include-stacktrace: always
+    include-exception: true

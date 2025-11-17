@@ -1,0 +1,69 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <h1>University AI FAQ Assistant</h1>
+    <p class="session-id">Session: {{ sessionId() }}</p>
+    <button class="clear-btn" (click)="clearChat()">New Chat</button>
+  </div>
+
+  <div class="messages-container">
+    @if (messages().length === 0) {
+      <div class="welcome-message">
+        <h2>Welcome! How can I help you today?</h2>
+        <p>Ask me about tuition, courses, deadlines, policies, or technical support.</p>
+      </div>
+    }
+    
+    @for (msg of messages(); track $index) {
+      <div class="message" [class]="msg.type + '-message'">
+        <div class="message-content">
+          <p>{{ msg.content }}</p>
+          @if (msg.type === 'ai' && msg.confidence) {
+            <span class="confidence-badge" [class]="getConfidenceClass(msg.confidence)">
+              Confidence: {{ (msg.confidence * 100).toFixed(0) }}%
+            </span>
+          }
+        </div>
+        <span class="message-time">{{ msg.timestamp | date:'short' }}</span>
+      </div>
+    }
+
+    @if (isLoading()) {
+      <div class="message ai-message loading">
+        <div class="message-content">
+          <p>Thinking...</p>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (suggestions().length > 0) {
+    <div class="suggestions">
+      <h3>Suggestions:</h3>
+      <div class="suggestion-chips">
+        @for (suggestion of suggestions(); track $index) {
+          <button class="suggestion-chip" (click)="selectSuggestion(suggestion)">
+            {{ suggestion }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="input-container">
+    <input 
+      type="text"
+      [(ngModel)]="userMessage"
+      (keyup.enter)="sendMessage()"
+      placeholder="Type your question here..."
+      [disabled]="isLoading()"
+      class="message-input"
+    />
+    <button 
+      (click)="sendMessage()"
+      [disabled]="!userMessage().trim() || isLoading()"
+      class="send-btn"
+    >
+      Send
+    </button>
+  </div>
+</div>
