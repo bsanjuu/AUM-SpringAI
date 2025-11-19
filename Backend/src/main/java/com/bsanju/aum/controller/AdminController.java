@@ -1,195 +1,207 @@
-// controller/AdminController.java
 package com.bsanju.aum.controller;
 
 import com.bsanju.aum.model.dto.DocumentDto;
-import com.bsanju.aum.model.dto.MetricsDto;
-import com.bsanju.aum.model.entity.UniversityDocument;
-import com.bsanju.aum.repository.DocumentRepository;
+import com.bsanju.aum.service.AumDataLoaderService;
 import com.bsanju.aum.service.DocumentIndexingService;
-import com.bsanju.aum.service.MetricsService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+/**
+ * Admin controller for managing documents and loading university data.
+ */
 @RestController
-@RequestMapping("/admin")
-@Tag(name = "Admin API", description = "Administrative endpoints for managing the FAQ system")
-@SecurityRequirement(name = "basicAuth")
+@RequestMapping("/api/admin")
+@CrossOrigin(origins = "*")
 public class AdminController {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
-    private final DocumentRepository documentRepository;
     private final DocumentIndexingService documentIndexingService;
-    private final MetricsService metricsService;
+    private final AumDataLoaderService aumDataLoaderService;
 
     public AdminController(
-            DocumentRepository documentRepository,
             DocumentIndexingService documentIndexingService,
-            MetricsService metricsService) {
-        this.documentRepository = documentRepository;
+            AumDataLoaderService aumDataLoaderService) {
         this.documentIndexingService = documentIndexingService;
-        this.metricsService = metricsService;
+        this.aumDataLoaderService = aumDataLoaderService;
     }
 
-    @GetMapping("/documents")
-    @Operation(summary = "Get all documents", description = "Retrieve paginated list of university documents")
-    public ResponseEntity<List<DocumentDto>> getDocuments(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(required = false) String category) {
+    /**
+     * Load AUM university data from official websites.
+     */
+    @PostMapping("/load-aum-data")
+    public ResponseEntity<Map<String, Object>> loadAumData() {
+        logger.info("Received request to load AUM data");
 
-        List<UniversityDocument> documents;
+        try {
+            AumDataLoaderService.LoadingStats stats = aumDataLoaderService.loadAumData();
 
-        if (category != null) {
-            try {
-                UniversityDocument.DocumentCategory cat = UniversityDocument.DocumentCategory.valueOf(category.toUpperCase());
-                documents = documentRepository.findByCategoryAndActiveTrue(cat);
-            } catch (IllegalArgumentException e) {
-                documents = documentRepository.findByActiveTrue();
-            }
-        } else {
-            documents = documentRepository.findByActiveTrue();
+            Map<String, Object> response = Map.of(
+                    "success", true,
+                    "message", "AUM data loaded successfully",
+                    "stats", Map.of(
+                            "urlsRequested", stats.urlsRequested(),
+                            "urlsScraped", stats.urlsScraped(),
+                            "chunksCreated", stats.chunksCreated(),
+                            "documentsIndexed", stats.documentsIndexed(),
+                            "durationMs", stats.durationMs(),
+                            "successRate", String.format("%.1f%%", stats.getSuccessRate()),
+                            "indexingRate", String.format("%.1f%%", stats.getIndexingRate())
+                    )
+            );
+
+            logger.info("AUM data loaded: {} documents indexed", stats.documentsIndexed());
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            logger.error("Failed to load AUM data", e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Failed to load AUM data",
+                            "error", e.getMessage()
+                    ));
+        }
+    }
+
+    /**
+     * Load data from custom URLs.
+     */
+    @PostMapping("/load-from-urls")
+    public ResponseEntity<Map<String, Object>> loadFromUrls(@RequestBody List<String> urls) {
+        logger.info("Received request to load data from {} custom URLs", urls.size());
+
+        if (urls == null || urls.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "success", false,
+                            "message", "URL list cannot be empty"
+                    ));
         }
 
-        List<DocumentDto> documentDtos = documents.stream()
-                .map(DocumentDto::fromEntity)
-                .collect(Collectors.toList());
+        try {
+            AumDataLoaderService.LoadingStats stats = aumDataLoaderService.loadFromUrls(urls);
 
-        return ResponseEntity.ok(documentDtos);
+            Map<String, Object> response = Map.of(
+                    "success", true,
+                    "message", "Data loaded successfully from custom URLs",
+                    "stats", Map.of(
+                            "urlsRequested", stats.urlsRequested(),
+                            "urlsScraped", stats.urlsScraped(),
+                            "chunksCreated", stats.chunksCreated(),
+                            "documentsIndexed", stats.documentsIndexed(),
+                            "durationMs", stats.durationMs(),
+                            "successRate", String.format("%.1f%%", stats.getSuccessRate()),
+                            "indexingRate", String.format("%.1f%%", stats.getIndexingRate())
+                    )
+            );
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            logger.error("Failed to load data from custom URLs", e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Failed to load data from custom URLs",
+                            "error", e.getMessage()
+                    ));
+        }
     }
 
-    @GetMapping("/documents/{id}")
-    @Operation(summary = "Get document by ID")
-    public ResponseEntity<DocumentDto> getDocument(@PathVariable Long id) {
-        return documentRepository.findById(id)
-                .map(doc -> ResponseEntity.ok(DocumentDto.fromEntity(doc)))
-                .orElse(ResponseEntity.notFound().build());
-    }
-
+    /**
+     * Index a single document manually.
+     */
     @PostMapping("/documents")
-    @Operation(summary = "Create new document")
-    public ResponseEntity<DocumentDto> createDocument(@Valid @RequestBody DocumentDto documentDto) {
-        UniversityDocument document = documentDto.toEntity();
-        document.setId(null); // Ensure it's a new document
+    public ResponseEntity<Map<String, Object>> indexDocument(@RequestBody DocumentDto documentDto) {
+        logger.info("Received request to index document: {}", documentDto.title());
 
-        UniversityDocument saved = documentRepository.save(document);
-        documentIndexingService.indexDocument(saved);
+        try {
+            documentIndexingService.indexDocument(documentDto);
 
-        logger.info("Created new document: {}", saved.getTitle());
-        return ResponseEntity.ok(DocumentDto.fromEntity(saved));
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Document indexed successfully",
+                    "title", documentDto.title()
+            ));
+
+        } catch (Exception e) {
+            logger.error("Failed to index document", e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Failed to index document",
+                            "error", e.getMessage()
+                    ));
+        }
     }
 
-    @PutMapping("/documents/{id}")
-    @Operation(summary = "Update existing document")
-    public ResponseEntity<DocumentDto> updateDocument(
-            @PathVariable Long id,
-            @Valid @RequestBody DocumentDto documentDto) {
+    /**
+     * Reindex all existing documents.
+     */
+    @PostMapping("/reindex")
+    public ResponseEntity<Map<String, Object>> reindexAllDocuments() {
+        logger.info("Received request to reindex all documents");
 
-        return documentRepository.findById(id)
-                .map(existing -> {
-                    existing.setTitle(documentDto.title());
-                    existing.setContent(documentDto.content());
-                    existing.setCategory(documentDto.category() != null ?
-                            UniversityDocument.DocumentCategory.valueOf(documentDto.category()) : null);
-                    existing.setSource(documentDto.source());
-                    existing.setVersion(documentDto.version());
-                    existing.setTags(documentDto.tags());
-                    existing.setActive(documentDto.active());
-
-                    UniversityDocument saved = documentRepository.save(existing);
-                    documentIndexingService.indexDocument(saved);
-
-                    logger.info("Updated document: {}", saved.getTitle());
-                    return ResponseEntity.ok(DocumentDto.fromEntity(saved));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/documents/{id}")
-    @Operation(summary = "Delete document")
-    public ResponseEntity<Map<String, String>> deleteDocument(@PathVariable Long id) {
-        return documentRepository.findById(id)
-                .map(document -> {
-                    document.setActive(false); // Soft delete
-                    documentRepository.save(document);
-                    logger.info("Deleted document: {}", document.getTitle());
-                    return ResponseEntity.ok(Map.of("message", "Document deleted successfully"));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/documents/reindex")
-    @Operation(summary = "Reindex all documents")
-    public ResponseEntity<Map<String, String>> reindexDocuments() {
         try {
             documentIndexingService.reindexAllDocuments();
-            return ResponseEntity.ok(Map.of("message", "Reindexing started successfully"));
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Reindexing started successfully"
+            ));
+
         } catch (Exception e) {
             logger.error("Failed to start reindexing", e);
             return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "Failed to start reindexing"));
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Failed to start reindexing",
+                            "error", e.getMessage()
+                    ));
         }
     }
 
-    @GetMapping("/metrics/daily")
-    @Operation(summary = "Get daily metrics")
-    public ResponseEntity<MetricsDto> getDailyMetrics(
-            @RequestParam(required = false) String date) {
-
-        LocalDate targetDate = date != null ? LocalDate.parse(date) : LocalDate.now();
-        MetricsDto metrics = metricsService.getDailyMetrics(targetDate);
-        return ResponseEntity.ok(metrics);
-    }
-
-    @GetMapping("/metrics/weekly")
-    @Operation(summary = "Get weekly metrics")
-    public ResponseEntity<MetricsDto> getWeeklyMetrics(
-            @RequestParam(required = false) String startDate) {
-
-        LocalDate targetDate = startDate != null ? LocalDate.parse(startDate) :
-                LocalDate.now().minusDays(7);
-        MetricsDto metrics = metricsService.getWeeklyMetrics(targetDate);
-        return ResponseEntity.ok(metrics);
-    }
-
-    @GetMapping("/metrics/monthly")
-    @Operation(summary = "Get monthly metrics")
-    public ResponseEntity<MetricsDto> getMonthlyMetrics(
-            @RequestParam(required = false) String startDate) {
-
-        LocalDate targetDate = startDate != null ? LocalDate.parse(startDate) :
-                LocalDate.now().minusMonths(1);
-        MetricsDto metrics = metricsService.getMonthlyMetrics(targetDate);
-        return ResponseEntity.ok(metrics);
-    }
-
+    /**
+     * Get indexing statistics.
+     */
     @GetMapping("/stats")
-    @Operation(summary = "Get system statistics")
-    public ResponseEntity<Map<String, Object>> getSystemStats() {
-        long totalDocuments = documentRepository.countActiveDocuments();
+    public ResponseEntity<Map<String, Object>> getIndexingStats() {
+        logger.debug("Received request for indexing stats");
 
-        Map<String, Object> stats = Map.of(
-                "totalDocuments", totalDocuments,
-                "documentsByCategory", documentRepository.getCategoryDistribution(),
-                "systemStatus", "healthy",
-                "lastUpdated", java.time.LocalDateTime.now()
-        );
+        try {
+            Map<String, Object> stats = documentIndexingService.getIndexingStats();
 
-        return ResponseEntity.ok(stats);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "stats", stats
+            ));
+
+        } catch (Exception e) {
+            logger.error("Failed to get indexing stats", e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Failed to get indexing stats",
+                            "error", e.getMessage()
+                    ));
+        }
+    }
+
+    /**
+     * Health check endpoint for admin API.
+     */
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, Object>> health() {
+        return ResponseEntity.ok(Map.of(
+                "status", "healthy",
+                "service", "admin-api",
+                "timestamp", System.currentTimeMillis()
+        ));
     }
 }

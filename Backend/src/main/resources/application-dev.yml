@@ -2,19 +2,26 @@
 # Overrides and additions for development environment
 
 spring:
-  # Development Database
+  # Development Database (H2 in-memory for easy testing)
   datasource:
-    url: jdbc:postgresql://localhost:5432/aum_faq_dev
-    username: postgres
-    password: postgres
-    
+    url: jdbc:h2:mem:aum_faq_dev;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
   # JPA Configuration for Development
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
         use_sql_comments: true
         
