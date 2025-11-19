@@ -1,0 +1,188 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <h1>AUM Data Management</h1>
+    <p>Load and manage Auburn University at Montgomery knowledge base</p>
+  </div>
+
+  <!-- Loading Indicator -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>{{ loadingMessage() }}</p>
+    </div>
+  }
+
+  <!-- Action Cards -->
+  <div class="action-cards">
+    <!-- Load AUM Data Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Load Official AUM Data</h2>
+      </div>
+      <div class="card-body">
+        <p>Load data from pre-configured AUM official websites:</p>
+        <ul class="url-list">
+          <li>Homepage (www.aum.edu)</li>
+          <li>Academic Catalogs</li>
+          <li>Digital Archives</li>
+          <li>Admissions Information</li>
+          <li>University Directory</li>
+        </ul>
+        <button
+          class="btn btn-primary"
+          (click)="loadAumData()"
+          [disabled]="isLoading()"
+        >
+          Load AUM Data
+        </button>
+      </div>
+    </div>
+
+    <!-- Custom URLs Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Load Custom URLs</h2>
+      </div>
+      <div class="card-body">
+        <p>Load data from specific AUM pages</p>
+        <button
+          class="btn btn-secondary"
+          (click)="toggleCustomUrlInput()"
+          [disabled]="isLoading()"
+        >
+          {{ showCustomUrlInput() ? 'Cancel' : 'Add Custom URLs' }}
+        </button>
+
+        @if (showCustomUrlInput()) {
+          <div class="custom-url-input">
+            <textarea
+              [(ngModel)]="customUrls"
+              placeholder="Enter URLs (one per line)&#10;Example:&#10;https://www.aum.edu/tuition-fees&#10;https://www.aum.edu/academic-calendar"
+              rows="6"
+              class="url-textarea"
+            ></textarea>
+            <button
+              class="btn btn-primary"
+              (click)="loadCustomUrls()"
+              [disabled]="!customUrls().trim() || isLoading()"
+            >
+              Load URLs
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Reindex Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Maintenance</h2>
+      </div>
+      <div class="card-body">
+        <p>Reindex all existing documents in the knowledge base</p>
+        <button
+          class="btn btn-warning"
+          (click)="reindexAllDocuments()"
+          [disabled]="isLoading()"
+        >
+          Reindex All Documents
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Last Load Result -->
+  @if (lastLoadResult()) {
+    <div class="result-card" [class.success]="lastLoadResult()!.success" [class.error]="!lastLoadResult()!.success">
+      <div class="result-header">
+        <h3>{{ lastLoadResult()!.success ? '✓ Success' : '✗ Error' }}</h3>
+        <p>{{ lastLoadResult()!.message }}</p>
+      </div>
+
+      @if (lastLoadResult()!.stats) {
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">URLs Requested:</span>
+            <span class="stat-value">{{ lastLoadResult()!.stats!.urlsRequested }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">URLs Scraped:</span>
+            <span class="stat-value">{{ lastLoadResult()!.stats!.urlsScraped }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Chunks Created:</span>
+            <span class="stat-value">{{ lastLoadResult()!.stats!.chunksCreated }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Documents Indexed:</span>
+            <span class="stat-value">{{ lastLoadResult()!.stats!.documentsIndexed }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Duration:</span>
+            <span class="stat-value">{{ formatDuration(lastLoadResult()!.stats!.durationMs) }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Success Rate:</span>
+            <span class="stat-value">{{ lastLoadResult()!.stats!.successRate }}</span>
+          </div>
+        </div>
+      }
+
+      @if (lastLoadResult()!.error) {
+        <div class="error-message">
+          <strong>Error:</strong> {{ lastLoadResult()!.error }}
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Current Stats -->
+  @if (stats()) {
+    <div class="stats-card">
+      <div class="card-header">
+        <h2>Knowledge Base Statistics</h2>
+        <button class="btn btn-secondary btn-sm" (click)="loadStats()">Refresh</button>
+      </div>
+      <div class="card-body">
+        <div class="stats-grid">
+          <div class="stat-item large">
+            <span class="stat-label">Total Documents:</span>
+            <span class="stat-value">{{ stats()!.stats.totalDocuments }}</span>
+          </div>
+          <div class="stat-item large">
+            <span class="stat-label">Indexed:</span>
+            <span class="stat-value">{{ stats()!.stats.indexedDocuments }}</span>
+          </div>
+          <div class="stat-item large">
+            <span class="stat-label">Not Indexed:</span>
+            <span class="stat-value">{{ stats()!.stats.notIndexedDocuments }}</span>
+          </div>
+          <div class="stat-item large">
+            <span class="stat-label">Indexing Rate:</span>
+            <span class="stat-value">{{ stats()!.stats.indexingRate.toFixed(1) }}%</span>
+          </div>
+        </div>
+
+        @if (getCategoryEntries().length > 0) {
+          <div class="category-stats">
+            <h3>Documents by Category</h3>
+            <div class="category-grid">
+              @for (entry of getCategoryEntries(); track entry[0]) {
+                <div class="category-item">
+                  <span class="category-name">{{ entry[0] }}</span>
+                  <span class="category-count">{{ entry[1] }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (stats()!.stats.lastUpdate) {
+          <div class="last-update">
+            Last updated: {{ stats()!.stats.lastUpdate | date:'medium' }}
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

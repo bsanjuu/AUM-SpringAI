@@ -1,15 +1,26 @@
 <div class="chat-container">
   <div class="chat-header">
-    <h1>University AI FAQ Assistant</h1>
-    <p class="session-id">Session: {{ sessionId() }}</p>
+    <div class="header-content">
+      <h1>🦅 AUM AI Assistant</h1>
+      <p class="subtitle">Auburn University at Montgomery</p>
+      <p class="session-id">Session: {{ sessionId() }}</p>
+    </div>
     <button class="clear-btn" (click)="clearChat()">New Chat</button>
   </div>
 
   <div class="messages-container">
     @if (messages().length === 0) {
       <div class="welcome-message">
-        <h2>Welcome! How can I help you today?</h2>
-        <p>Ask me about tuition, courses, deadlines, policies, or technical support.</p>
+        <h2>Welcome to Auburn University at Montgomery!</h2>
+        <p>I'm your AI assistant, ready to help with questions about:</p>
+        <div class="topic-chips">
+          <span class="topic-chip">Admissions</span>
+          <span class="topic-chip">Tuition & Fees</span>
+          <span class="topic-chip">Academic Programs</span>
+          <span class="topic-chip">Campus Life</span>
+          <span class="topic-chip">Important Dates</span>
+        </div>
+        <p class="info-note">💡 I use official AUM information to provide accurate answers!</p>
       </div>
     }
     
@@ -54,7 +65,7 @@
       type="text"
       [(ngModel)]="userMessage"
       (keyup.enter)="sendMessage()"
-      placeholder="Type your question here..."
+      placeholder="Ask me anything about AUM..."
       [disabled]="isLoading()"
       class="message-input"
     />
