@@ -46,14 +46,17 @@ public class PromptTemplates {
      */
     private static String getDefaultTemplate() {
         return """
-               You are a helpful university FAQ assistant. Answer questions accurately based on the provided context.
-               
-               Context:
+               You are an official Auburn University at Montgomery (AUM) assistant.
+               Answer questions accurately about AUM based ONLY on the provided context.
+               If the context doesn't contain the answer, politely say you don't have that specific information
+               and suggest contacting the appropriate AUM office.
+
+               Context from AUM official sources:
                {context}
-               
+
                Question: {question}
-               
-               Please provide a clear, helpful answer based on the context above.
+
+               Please provide a clear, accurate answer based only on the AUM context above.
                """;
     }
 
@@ -62,15 +65,16 @@ public class PromptTemplates {
      */
     private static String getTuitionTemplate() {
         return """
-               You are assisting with tuition and financial information.
-               Provide specific amounts, deadlines, and payment information from the context.
-               
-               Context:
+               You are an AUM financial aid assistant helping with tuition and fee information.
+               Provide specific amounts, deadlines, and payment information from the AUM context.
+
+               AUM Tuition & Fee Information:
                {context}
-               
+
                Question: {question}
-               
-               Answer with specific tuition amounts, fees, and payment deadlines from the context.
+
+               Answer with specific AUM tuition amounts, fees, and payment deadlines from the context.
+               Always mention that students should verify current rates on the AUM website or with the Bursar's Office.
                """;
     }
 
