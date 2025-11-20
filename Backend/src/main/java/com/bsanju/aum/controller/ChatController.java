@@ -93,14 +93,14 @@ public class ChatController {
      * GET /api/chat/history/{sessionId}
      */
     @GetMapping("/history/{sessionId}")
-    public ResponseEntity<List<ChatSession>> getChatHistory(
+    public ResponseEntity<List<ChatResponse>> getChatHistory(
             @PathVariable String sessionId,
             @RequestParam(defaultValue = "50") int limit) {
-        
+
         logger.debug("Fetching chat history: sessionId={}, limit={}", sessionId, limit);
-        
+
         try {
-            List<ChatSession> history = chatService.getChatHistory(sessionId, limit);
+            List<ChatResponse> history = chatService.getChatHistory(sessionId, limit);
             return ResponseEntity.ok(history);
             
         } catch (Exception e) {

@@ -132,4 +132,10 @@ public interface MetricsRepository extends JpaRepository<QueryMetrics, Long> {
      */
     @Query("SELECT m FROM QueryMetrics m WHERE m.confidence < :threshold AND m.timestamp BETWEEN :startDate AND :endDate ORDER BY m.confidence ASC")
     List<QueryMetrics> findLowConfidenceQueriesInRange(@Param("threshold") double threshold, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    /**
+     * Find metrics by date range (using LocalDate).
+     */
+    @Query("SELECT m FROM QueryMetrics m WHERE CAST(m.timestamp AS LocalDate) >= :startDate AND CAST(m.timestamp AS LocalDate) < :endDate ORDER BY m.timestamp DESC")
+    List<QueryMetrics> findByDateOnlyBetween(@Param("startDate") java.time.LocalDate startDate, @Param("endDate") java.time.LocalDate endDate);
 }

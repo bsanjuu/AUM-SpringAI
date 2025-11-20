@@ -87,6 +87,24 @@ public interface FeedbackRepository extends JpaRepository<UserFeedback, Long> {
     Long countFeedbackSince(@Param("since") LocalDateTime since);
 
     /**
+     * Count total feedback since a specific time (alias for countFeedbackSince).
+     */
+    @Query("SELECT COUNT(f) FROM UserFeedback f WHERE f.timestamp >= :since")
+    Long countTotalFeedbackSince(@Param("since") LocalDateTime since);
+
+    /**
+     * Count helpful feedback since a specific time.
+     */
+    @Query("SELECT COUNT(f) FROM UserFeedback f WHERE f.timestamp >= :since AND f.helpful = true")
+    Long countHelpfulFeedbackSince(@Param("since") LocalDateTime since);
+
+    /**
+     * Get average rating since a specific time.
+     */
+    @Query("SELECT AVG(f.rating) FROM UserFeedback f WHERE f.timestamp >= :since AND f.rating IS NOT NULL")
+    Double averageRatingSince(@Param("since") LocalDateTime since);
+
+    /**
      * Get average rating.
      */
     @Query("SELECT AVG(f.rating) FROM UserFeedback f WHERE f.rating IS NOT NULL")

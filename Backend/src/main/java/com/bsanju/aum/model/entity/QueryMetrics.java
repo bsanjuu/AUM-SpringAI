@@ -56,6 +56,12 @@ public class QueryMetrics {
     @Column(name = "error_message", length = 1000)
     private String errorMessage;
 
+    @Column(name = "query_length")
+    private int queryLength;
+
+    @Column(name = "response_length")
+    private int responseLength;
+
     // Constructors
     public QueryMetrics() {
         this.timestamp = LocalDateTime.now();
@@ -171,6 +177,39 @@ public class QueryMetrics {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public int getQueryLength() {
+        return queryLength;
+    }
+
+    public void setQueryLength(int queryLength) {
+        this.queryLength = queryLength;
+    }
+
+    public int getResponseLength() {
+        return responseLength;
+    }
+
+    public void setResponseLength(int responseLength) {
+        this.responseLength = responseLength;
+    }
+
+    // Convenience methods for MetricsService
+    public double getConfidenceScore() {
+        return this.confidence;
+    }
+
+    public void setConfidenceScore(double confidenceScore) {
+        this.confidence = confidenceScore;
+    }
+
+    public int getHourOfDay() {
+        return this.timestamp != null ? this.timestamp.getHour() : 0;
+    }
+
+    public java.time.LocalDate getDateOnly() {
+        return this.timestamp != null ? this.timestamp.toLocalDate() : null;
     }
 
     @Override
