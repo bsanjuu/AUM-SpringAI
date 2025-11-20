@@ -1,1 +1,17 @@
-<router-outlet />
+<div class="app-container">
+  <nav class="app-nav">
+    <div class="nav-brand">
+      <span class="brand-icon">🦅</span>
+      <span class="brand-text">AUM AI</span>
+    </div>
+    <div class="nav-links">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        💬 Chat
+      </a>
+      <a routerLink="/admin" routerLinkActive="active">
+        ⚙️ Admin
+      </a>
+    </div>
+  </nav>
+  <router-outlet />
+</div>
