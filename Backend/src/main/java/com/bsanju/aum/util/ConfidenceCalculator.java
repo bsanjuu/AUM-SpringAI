@@ -2,6 +2,7 @@ package com.bsanju.aum.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -9,12 +10,26 @@ import java.util.List;
  * Utility class for calculating confidence scores for AI responses.
  * Uses various heuristics to determine response quality and reliability.
  */
+@Component
 public class ConfidenceCalculator {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfidenceCalculator.class);
 
     private static final double HIGH_CONFIDENCE_THRESHOLD = 0.75;
     private static final double LOW_CONFIDENCE_THRESHOLD = 0.50;
+
+    /**
+     * Calculate confidence score for a response (instance method).
+     *
+     * @param response The AI response
+     * @param relevantDocs List of relevant documents retrieved
+     * @return Confidence score between 0.0 and 1.0
+     */
+    public double calculate(String response, List<String> relevantDocs) {
+        int documentsRetrieved = relevantDocs != null ? relevantDocs.size() : 0;
+        // Category is not passed, so we use null (will result in default confidence)
+        return calculateConfidence(response, documentsRetrieved, null);
+    }
 
     /**
      * Calculate confidence score for a response.
@@ -24,8 +39,8 @@ public class ConfidenceCalculator {
      * @param category The query category
      * @return Confidence score between 0.0 and 1.0
      */
-    public static double calculateConfidence(String response, 
-                                            int documentsRetrieved, 
+    public static double calculateConfidence(String response,
+                                            int documentsRetrieved,
                                             String category) {
         double confidence = 0.0;
 

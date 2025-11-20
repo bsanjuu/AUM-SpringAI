@@ -47,12 +47,33 @@ public class KnowledgeRetrievalService {
                     .withSimilarityThreshold(0.5);
 
             List<Document> documents = vectorStore.similaritySearch(searchRequest);
-            
+
             logger.info("Retrieved {} documents for query", documents.size());
             return documents;
 
         } catch (Exception e) {
             logger.error("Error retrieving documents from vector store", e);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Find relevant documents and return their content as strings.
+     *
+     * @param query The user query
+     * @param topK Number of documents to retrieve
+     * @return List of document contents as strings
+     */
+    public List<String> findRelevantDocuments(String query, int topK) {
+        logger.debug("Finding relevant documents for query: {}, topK: {}", query, topK);
+
+        try {
+            List<Document> documents = retrieveRelevantDocuments(query, topK);
+            return documents.stream()
+                    .map(Document::getContent)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.error("Error finding relevant documents", e);
             return Collections.emptyList();
         }
     }

@@ -1,12 +1,30 @@
 package com.bsanju.aum.util;
 
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 
 /**
  * Utility class for managing prompt templates and building context strings.
  * Provides methods for constructing prompts for different categories.
  */
+@Component
 public class PromptTemplates {
+
+    /**
+     * Build a system prompt with context documents for RAG (instance method).
+     *
+     * @param relevantDocs List of relevant document contents
+     * @param category The query category
+     * @return Complete system prompt string
+     */
+    public String buildSystemPrompt(List<String> relevantDocs, String category) {
+        String context = buildContextFromDocuments(relevantDocs);
+        String template = getTemplateForCategory(category);
+
+        // For system prompts, we only need the template with context, not the question
+        return template.replace("{context}", context).replace("{question}", "");
+    }
 
     /**
      * Build a system prompt with context for RAG.

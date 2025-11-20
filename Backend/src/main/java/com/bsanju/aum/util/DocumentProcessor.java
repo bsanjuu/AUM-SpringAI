@@ -52,8 +52,25 @@ public class DocumentProcessor {
     }
 
     private String formatFieldName(String fieldName) {
-        return fieldName.replace("_", " ").replace("-", " ")
-                .replaceAll("\\b\\w", m -> m.group().toUpperCase());
+        String formatted = fieldName.replace("_", " ").replace("-", " ");
+
+        // Capitalize first letter of each word
+        StringBuilder result = new StringBuilder();
+        boolean capitalizeNext = true;
+
+        for (char c : formatted.toCharArray()) {
+            if (Character.isWhitespace(c)) {
+                capitalizeNext = true;
+                result.append(c);
+            } else if (capitalizeNext) {
+                result.append(Character.toUpperCase(c));
+                capitalizeNext = false;
+            } else {
+                result.append(c);
+            }
+        }
+
+        return result.toString();
     }
 
     public String processMarkdownToText(Resource resource) throws IOException {
